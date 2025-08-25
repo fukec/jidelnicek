@@ -30,7 +30,7 @@
 
     <script>
         const CONFIG = {
-            API_URL: '1ARwLf0cFVqiv2uFPnFQxXKe-wjtBitRGOP06IJhyDz98LB8x4X-C773l', // ⚠️ MUSÍŠ NAHRADIT!
+            API_URL: 'https://script.google.com/macros/s/AKfycby_EAwyBCmVhRsO59AEeS6ybRPCkXeHXHBhL3t4CgpOH46LnQA2806dvc-mpnLgawbQ/exec', // ⚠️ MUSÍŠ NAHRADIT!
             TEST_CLIENT_KEY: 'diagnostic_test'
         };
 
@@ -71,7 +71,7 @@
         function testConfiguration() {
             addResult('info', '1️⃣ Test konfigurace', '');
 
-            if (CONFIG.API_URL === 'ZDE_VLOZ_SVUJ_APPS_SCRIPT_URL') {
+            if (CONFIG.API_URL === 'https://script.google.com/macros/s/AKfycby_EAwyBCmVhRsO59AEeS6ybRPCkXeHXHBhL3t4CgpOH46LnQA2806dvc-mpnLgawbQ/exec') {
                 addResult('error', '❌ API_URL není nakonfigurováno', 'Nastavte správné Apps Script URL v kódu');
                 return;
             }
