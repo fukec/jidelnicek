@@ -4,23 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Stravovací deník - Zadání</title>
-  <meta name="description" content="Webový formulář pro zadávání denních přehledů stravy" />
-  <meta name="author" content="Stravovací poradce" />
-
-  <!-- Bootstrap CSS -->
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
 
   <style>
     :root {
       --primary-color: #28a745;
-      --secondary-color: #6c757d;
       --success-color: #20c997;
       --danger-color: #dc3545;
       --warning-color: #ffc107;
-      --info-color: #17a2b8;
-      --light-color: #f8f9fa;
-      --dark-color: #343a40;
     }
 
     body {
@@ -45,294 +38,60 @@
       color: white;
       padding: 2rem;
       text-align: center;
-      position: relative;
     }
 
-    .header-section h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .client-info {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      display: inline-block;
-      margin-top: 1rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .form-section {
-      padding: 2rem;
-    }
-
-    .date-section {
-      background: var(--light-color);
-      border-radius: 15px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      border: 2px solid #e9ecef;
-    }
-
-    .entries-container {
-      min-height: 200px;
-    }
-
-    .entry-card {
-      background: white;
-      border: 2px solid #e9ecef;
-      border-radius: 15px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .entry-card:hover {
-      border-color: var(--primary-color);
-      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.2);
-    }
-
-    .entry-number {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      background: var(--primary-color);
-      color: white;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-
-    .form-label {
-      color: var(--dark-color);
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .form-control, .form-select {
-      border: 2px solid #e9ecef;
-      border-radius: 10px;
-      padding: 0.75rem;
-      transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-    }
-
-    .btn {
-      border-radius: 10px;
-      padding: 0.75rem 1.5rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary-color), var(--success-color));
-      border: none;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-    }
-
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-
-    .loading-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 15px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .spinner-border {
-      width: 3rem;
-      height: 3rem;
-    }
-
-    .alert {
-      border-radius: 15px;
-      border: none;
-      padding: 1rem 1.5rem;
-      margin: 1rem 0;
-    }
-
-    .navbar-custom {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      padding: 1rem 0;
-      margin-bottom: 1rem;
-    }
-
-    .new-entry {
-      animation: slideInUp 0.5s ease-out;
-    }
-
-    @keyframes slideInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideOutUp {
-      from {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-    }
-
-    .items-counter {
-      background: var(--info-color);
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-weight: bold;
-      display: inline-block;
-      margin-bottom: 1rem;
-    }
-
-    .debug-info {
-      background: #f8f9fa;
-      border: 1px solid #e9ecef;
-      border-radius: 10px;
-      padding: 1rem;
-      margin: 1rem 0;
-      font-family: monospace;
-      font-size: 0.9rem;
-    }
-
-    @media (max-width: 768px) {
-      .header-section h1 {
-        font-size: 2rem;
-      }
-      
-      .entry-card {
-        padding: 1rem;
-      }
-      
-      .form-section {
-        padding: 1rem;
-      }
-    }
+    .form-section { padding: 2rem; }
+    .date-section { background: #f8f9fa; border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; }
+    .entry-card { background: white; border: 2px solid #e9ecef; border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; position: relative; }
+    .entry-number { position: absolute; top: -10px; right: -10px; background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .form-control, .form-select { border: 2px solid #e9ecef; border-radius: 10px; padding: 0.75rem; }
+    .btn { border-radius: 10px; padding: 0.75rem 1.5rem; font-weight: 600; }
+    .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .loading-content { background: white; padding: 2rem; border-radius: 15px; text-align: center; }
+    .debug-info { background: #f8f9fa; border: 1px solid #e9ecef; padding: 1rem; margin: 1rem 0; font-family: monospace; font-size: 0.9rem; }
   </style>
 </head>
 
 <body>
-  <!-- Navigation -->
-  <nav class="navbar navbar-custom">
-    <div class="container">
-      <div class="row w-100 align-items-center">
-        <div class="col-md-4">
-          <span class="navbar-brand mb-0 h4">
-            <i class="bi bi-journal-text me-2"></i>Stravovací deník
-          </span>
-        </div>
-        <div class="col-md-4 text-center">
-          <div class="items-counter" id="items-counter">0 položek</div>
-        </div>
-        <div class="col-md-4 text-end">
-          <a href="#" id="mydata-link" class="btn btn-outline-primary btn-sm">
-            <i class="bi bi-graph-up me-1"></i>Týdenní přehled
-          </a>
-          <a href="admin.html" class="btn btn-outline-secondary btn-sm ms-2">
-            <i class="bi bi-gear me-1"></i>Admin panel
-          </a>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Main Container -->
   <div class="container">
     <div class="main-container">
       
-      <!-- Header Section -->
       <div class="header-section">
-        <h1><i class="bi bi-egg-fried me-3"></i>Zadání denních přehledů stravy</h1>
+        <h1><i class="bi bi-egg-fried me-3"></i>Stravovací deník</h1>
         <div class="client-info" id="client-name">Načítám...</div>
       </div>
 
-      <!-- Form Section -->
       <div class="form-section">
         
-        <!-- Alert Area -->
         <div id="result" class="alert d-none" role="alert"></div>
         
-        <!-- Date Selection -->
         <div class="date-section">
           <h4><i class="bi bi-calendar3 me-2"></i>Datum záznamu</h4>
           <div class="row g-3 align-items-end">
             <div class="col-md-4">
               <label for="datum" class="form-label fw-semibold">Datum</label>
               <input type="date" class="form-control" id="datum" required>
-              <div class="invalid-feedback">Prosím vyberte datum.</div>
             </div>
             <div class="col-md-8">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-outline-success" id="today-btn">
-                  <i class="bi bi-calendar-check me-1"></i>Dnes
-                </button>
-                <button type="button" class="btn btn-outline-info" id="yesterday-btn">
-                  <i class="bi bi-calendar-minus me-1"></i>Včera
-                </button>
-                <button type="button" class="btn btn-outline-danger" id="clear-form-btn">
-                  <i class="bi bi-trash me-1"></i>Vymazat
-                </button>
-              </div>
+              <button type="button" class="btn btn-outline-success me-2" id="today-btn">Dnes</button>
+              <button type="button" class="btn btn-outline-info me-2" id="yesterday-btn">Včera</button>
+              <button type="button" class="btn btn-outline-danger" id="clear-form-btn">Vymazat</button>
             </div>
           </div>
         </div>
 
-        <!-- Form -->
         <form id="food-form" novalidate>
           
-          <h4><i class="bi bi-list-ul me-2"></i>Položky stravy</h4>
+          <h4><i class="bi bi-list-ul me-2"></i>Položky stravy <span class="badge bg-info" id="items-counter">0 položek</span></h4>
           
-          <!-- Food Entries Container -->
-          <div id="entries" class="entries-container mb-4"></div>
+          <div id="entries" class="mb-4"></div>
           
-          <!-- Add Item Button -->
           <div class="text-center mb-4">
             <button type="button" class="btn btn-success btn-lg" id="add-item-btn">
               <i class="bi bi-plus-circle me-2"></i>Přidat položku
             </button>
           </div>
           
-          <!-- Submit Button -->
           <div class="text-center">
             <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
               <i class="bi bi-send me-2"></i>Odeslat deník
@@ -340,49 +99,33 @@
           </div>
           
         </form>
+
+        <div id="debug-info" class="debug-info"></div>
       </div>
     </div>
   </div>
 
-  <!-- Loading Overlay -->
   <div id="loading-overlay" class="loading-overlay d-none">
     <div class="loading-content">
-      <div class="spinner-border text-primary mb-3" role="status">
-        <span class="visually-hidden">Načítám...</span>
-      </div>
+      <div class="spinner-border text-primary mb-3" role="status"></div>
       <h5>Ukládám data...</h5>
       <p class="text-muted mb-0">Prosím počkejte</p>
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Main JavaScript - OPRAVENÁ VERZE -->
   <script>
     // ===== KONFIGURACE =====
     const CONFIG = {
-      API_URL: "https://script.google.com/macros/s/AKfycbziKfUVJg_JySG_9yVGauozO1tApF8jSuere73P6Obt5tnEGNwgetizGCQsSYuza7I/exec", // ⚠️ MUSÍŠ NAHRADIT SPRÁVNOU URL!
-      MEALS: [
-        "Snídaně",
-        "Svačina dopoledne", 
-        "Oběd",
-        "Svačina odpoledne",
-        "Večeře",
-        "Jiný příjem",
-        "Pitný režim",
-      ],
+      API_URL: "https://script.google.com/macros/s/AKfycbyTIXx1yUgfd5-ZIYHQVBF_GIZs3VNkNR-k7dZ7nrkj91h-S1uOl5wW3g3tiHKOtNyb/exec", // ⚠️ NAHRAĎ SVOJÍ URL!
+      MEALS: ["Snídaně", "Svačina dopoledne", "Oběd", "Svačina odpoledne", "Večeře", "Jiný příjem", "Pitný režim"],
       MAX_ITEMS: 20,
-      AUTO_SAVE_INTERVAL: 30000, // 30 sekund
-      DEBUG: true, // ← zapni pro debugging
-      TIMEOUT: 30000, // 30 sekund timeout
+      DEBUG: true
     };
 
-    // ===== GLOBÁLNÍ PROMĚNNÉ =====
     let currentClientKey = "";
     let itemCounter = 0;
-    let autoSaveTimer = null;
-    let isDirty = false;
 
     // ===== INICIALIZACE =====
     document.addEventListener("DOMContentLoaded", function () {
@@ -392,36 +135,26 @@
     function initializeApp() {
       const urlParams = new URLSearchParams(window.location.search);
       currentClientKey = urlParams.get("key") || "demo123";
-      setupUI();
-      setupEventListeners();  
+      
+      document.getElementById("client-name").textContent = `Klient: ${currentClientKey}`;
+      document.getElementById("datum").value = new Date().toISOString().split("T")[0];
+      
+      setupEventListeners();
       addFoodItem();
-      loadDraftData();
       
       if (CONFIG.DEBUG) {
-        console.log("Aplikace inicializována, klient:", currentClientKey);
-        console.log("API URL:", CONFIG.API_URL);
         showDebugInfo();
       }
     }
 
     function showDebugInfo() {
-      const debugDiv = document.createElement('div');
-      debugDiv.className = 'debug-info';
-      debugDiv.innerHTML = `
-        <strong>DEBUG INFO:</strong><br>
+      document.getElementById("debug-info").innerHTML = `
+        <strong>🔧 DEBUG INFO:</strong><br>
         Klient: ${currentClientKey}<br>
         API URL: ${CONFIG.API_URL}<br>
+        Status: ${CONFIG.API_URL.includes('YOUR_SCRIPT_ID') ? '❌ MUSÍŠ NASTAVIT URL!' : '✅ URL nastavena'}<br>
         Timestamp: ${new Date().toISOString()}
       `;
-      document.querySelector('.form-section').appendChild(debugDiv);
-    }
-
-    function setupUI() {
-      document.getElementById("client-name").textContent = `Klient: ${currentClientKey}`;
-      document.getElementById("mydata-link").href = `mydata.html?key=${currentClientKey}`;
-      const today = new Date().toISOString().split("T")[0];
-      document.getElementById("datum").value = today;
-      updateItemsCounter();
     }
 
     function setupEventListeners() {
@@ -430,105 +163,63 @@
       document.getElementById("clear-form-btn").addEventListener("click", clearForm);
       document.getElementById("today-btn").addEventListener("click", () => setDate(0));
       document.getElementById("yesterday-btn").addEventListener("click", () => setDate(-1));
-      document.getElementById("food-form").addEventListener("input", () => {
-        isDirty = true;
-        startAutoSave();
-      });
-      document.addEventListener("keydown", handleKeyboardShortcuts);
-      window.addEventListener("beforeunload", function (e) {
-        if (isDirty) {
-          saveDraftData();
-        }
-      });
     }
 
     function addFoodItem() {
       if (itemCounter >= CONFIG.MAX_ITEMS) {
-        showAlert(`Dosáhli jste maximálního počtu položek (${CONFIG.MAX_ITEMS})`, "warning");
+        showAlert(`Maximum ${CONFIG.MAX_ITEMS} položek`, "warning");
         return;
       }
+      
       itemCounter++;
       const entriesContainer = document.getElementById("entries");
       const entryCard = document.createElement("div");
-      entryCard.className = "entry-card new-entry";
+      entryCard.className = "entry-card";
       entryCard.setAttribute("data-item-id", itemCounter);
+      
       entryCard.innerHTML = `
         <div class="entry-number">${itemCounter}</div>
         <div class="row g-3">
-          <div class="col-lg-3 col-md-4">
-            <label class="form-label fw-semibold">
-              <i class="bi bi-clock me-1"></i>Druh chodu
-            </label>
+          <div class="col-lg-3">
+            <label class="form-label fw-semibold">Druh chodu</label>
             <select class="form-select" name="druh_chodu" required>
               <option value="">Vyberte chod</option>
-              ${CONFIG.MEALS.map((meal) => `<option value="${meal}">${meal}</option>`).join("")}
+              ${CONFIG.MEALS.map(meal => `<option value="${meal}">${meal}</option>`).join("")}
             </select>
-            <div class="invalid-feedback">Vyberte druh chodu.</div>
           </div>
-
-          <div class="col-lg-2 col-md-3 col-sm-6">
-            <label class="form-label fw-semibold">
-              <i class="bi bi-arrows-expand me-1"></i>Hmotnost
-            </label>
-            <div class="input-group">
-              <input type="number" class="form-control" name="hmotnost" min="0.1" max="10000" step="0.1" placeholder="0" required />
-              <span class="input-group-text">g/ml</span>
-            </div>
-            <div class="invalid-feedback">Zadejte hmotnost (0.1 - 10000).</div>
+          <div class="col-lg-2">
+            <label class="form-label fw-semibold">Hmotnost (g/ml)</label>
+            <input type="number" class="form-control" name="hmotnost" min="0.1" max="10000" step="0.1" required />
           </div>
-
-          <div class="col-lg-4 col-md-5">
-            <label class="form-label fw-semibold">
-              <i class="bi bi-egg-fried me-1"></i>Potravina
-            </label>
-            <input type="text" class="form-control" name="potravina" placeholder="Název potraviny" maxlength="100" required />
-            <div class="invalid-feedback">Zadejte název potraviny (max 100 znaků).</div>
+          <div class="col-lg-4">
+            <label class="form-label fw-semibold">Potravina</label>
+            <input type="text" class="form-control" name="potravina" maxlength="100" required />
           </div>
-
-          <div class="col-lg-2 col-md-3 col-sm-6">
-            <label class="form-label fw-semibold">
-              <i class="bi bi-fire me-1"></i>Kalorie
-            </label>
-            <div class="input-group">
-              <input type="number" class="form-control" name="kaloricka_hodnota" min="0" max="9999" step="1" placeholder="0" />
-              <span class="input-group-text">kcal</span>
-            </div>
-            <div class="invalid-feedback">Zadejte kalorie (0 - 9999).</div>
+          <div class="col-lg-2">
+            <label class="form-label fw-semibold">Kalorie (kcal)</label>
+            <input type="number" class="form-control" name="kaloricka_hodnota" min="0" max="9999" step="1" />
           </div>
-
-          <div class="col-lg-1 col-md-12 d-flex align-items-end">
-            <button type="button" class="btn btn-outline-danger w-100" onclick="removeFoodItem(this)" title="Odebrat položku">
+          <div class="col-lg-1">
+            <label class="form-label">&nbsp;</label>
+            <button type="button" class="btn btn-outline-danger w-100" onclick="removeFoodItem(this)">
               <i class="bi bi-trash"></i>
-              <span class="d-md-none ms-1">Odebrat</span>
             </button>
           </div>
         </div>
       `;
+      
       entriesContainer.appendChild(entryCard);
-      const firstSelect = entryCard.querySelector("select");
-      setTimeout(() => firstSelect.focus(), 100);
       updateItemsCounter();
-      if (CONFIG.DEBUG) {
-        console.log("Přidána položka:", itemCounter);
-      }
     }
 
     function removeFoodItem(button) {
-      const entryCard = button.closest(".entry-card");
       if (document.querySelectorAll(".entry-card").length <= 1) {
         showAlert("Musí zůstat alespoň jedna položka!", "warning");
         return;
       }
-      entryCard.style.animation = "slideOutUp 0.3s ease-in";
-      setTimeout(() => {
-        entryCard.remove();
-        updateItemsCounter();
-        updateEntryNumbers();
-        isDirty = true;
-      }, 300);
-      if (CONFIG.DEBUG) {
-        console.log("Odebrána položka");
-      }
+      button.closest(".entry-card").remove();
+      updateEntryNumbers();
+      updateItemsCounter();
     }
 
     function updateEntryNumbers() {
@@ -549,72 +240,45 @@
     function setDate(daysOffset) {
       const date = new Date();
       date.setDate(date.getDate() + daysOffset);
-      document.getElementById("datum").value = date.toISOString().split("T")[0];  
-      isDirty = true;
+      document.getElementById("datum").value = date.toISOString().split("T")[0];
     }
 
     function clearForm() {
-      if (!confirm("Opravdu chcete vymazat všechny položky? Tato akce se nedá vrátit.")) return;
+      if (!confirm("Opravdu chcete vymazat všechny položky?")) return;
       document.getElementById("entries").innerHTML = "";
       itemCounter = 0;
       addFoodItem();
       document.getElementById("result").classList.add("d-none");
-      clearDraftData();
-      isDirty = false;
-      showAlert("Formulář byl vymazán", "info");
     }
 
     async function handleFormSubmit(event) {
       event.preventDefault();
-      if (!validateForm()) return;
+      
+      if (CONFIG.API_URL.includes('YOUR_SCRIPT_ID')) {
+        showAlert("❌ MUSÍŠ NASTAVIT API_URL v kódu! Nahraď YOUR_SCRIPT_ID_HERE svou Google Apps Script URL.", "danger");
+        return;
+      }
+      
       const formData = gatherFormData();
       if (!formData) return;
       await submitData(formData);
     }
 
-    function validateForm() {
-      const datum = document.getElementById("datum").value;
-      if (!datum) {
-        showAlert("Prosím vyberte datum.", "danger");
-        document.getElementById("datum").focus();
-        return false;
-      }
-      let isValid = true;
-      const entryCards = document.querySelectorAll(".entry-card");
-      if (entryCards.length === 0) {
-        showAlert("Přidejte alespoň jednu položku!", "warning");
-        return false;
-      }
-      entryCards.forEach((card) => {
-        card.querySelectorAll("input, select").forEach((input) => {
-          if (!input.checkValidity()) {
-            input.classList.add("is-invalid");
-            isValid = false;
-          } else {
-            input.classList.remove("is-invalid");
-          }
-        });
-      });
-      if (!isValid) {
-        showAlert("Prosím opravte chyby ve formuláři.", "danger");
-        const firstError = document.querySelector(".is-invalid");
-        if (firstError) {
-          firstError.scrollIntoView({ behavior: "smooth", block: "center" });
-          firstError.focus();
-        }
-      }
-      return isValid;
-    }
-
     function gatherFormData() {
       const datum = document.getElementById("datum").value;
+      if (!datum) {
+        showAlert("Vyberte datum", "danger");
+        return null;
+      }
+      
       const items = [];
       document.querySelectorAll(".entry-card").forEach((card) => {
         const druh_chodu = card.querySelector("select[name='druh_chodu']").value;
         const hmotnost = card.querySelector("input[name='hmotnost']").value;
         const potravina = card.querySelector("input[name='potravina']").value.trim();
         const kaloricka_hodnota = card.querySelector("input[name='kaloricka_hodnota']").value;
-        if (potravina && hmotnost && parseFloat(hmotnost) > 0) {
+        
+        if (potravina && hmotnost && parseFloat(hmotnost) > 0 && druh_chodu) {
           items.push({
             datum: datum,
             druh_chodu: druh_chodu,
@@ -624,17 +288,18 @@
           });
         }
       });
+      
       if (items.length === 0) {
         showAlert("Žádné platné položky k odeslání!", "warning");
         return null;
       }
+      
       return {
         klient_klic: currentClientKey,
         items: items,
       };
     }
 
-    // OPRAVENÁ SUBMIT FUNKCE s lepším error handlingem
     async function submitData(data) {
       const loadingOverlay = document.getElementById("loading-overlay");
       const submitBtn = document.getElementById("submit-btn");
@@ -644,79 +309,59 @@
         submitBtn.disabled = true;
         
         if (CONFIG.DEBUG) {
-          console.log("Odesílám data:", data);
-          console.log("URL:", CONFIG.API_URL);
+          console.log("🚀 Odesílám data:", data);
+          console.log("🔗 URL:", CONFIG.API_URL);
         }
 
-        // Přidáme timeout pomocí AbortController
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT);
-
+        // KRITICKÉ NASTAVENÍ PRO GOOGLE APPS SCRIPT
         const response = await fetch(CONFIG.API_URL, {
           method: "POST",
+          redirect: "follow",
           headers: { 
-            "Content-Type": "application/json",
-            "Accept": "application/json"
+            "Content-Type": "text/plain;charset=utf-8"
           },
-          body: JSON.stringify(data),
-          signal: controller.signal
+          body: JSON.stringify(data)
         });
 
-        clearTimeout(timeoutId);
-
         if (CONFIG.DEBUG) {
-          console.log("Response status:", response.status);
-          console.log("Response headers:", response.headers);
+          console.log("📡 Response status:", response.status);
+          console.log("🔗 Response URL:", response.url);
+        }
+
+        const responseText = await response.text();
+        
+        if (CONFIG.DEBUG) {
+          console.log("📄 Raw response:", responseText);
         }
 
         let result;
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          result = await response.json();
-        } else {
-          const text = await response.text();
-          if (CONFIG.DEBUG) {
-            console.log("Non-JSON response:", text);
-          }
-          throw new Error("Server nevrátil JSON odpověď. Možná chyba v konfiguraci.");
+        try {
+          result = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error("❌ JSON parse error:", parseError);
+          throw new Error("Server nevrátil platný JSON. Zkontroluj Google Apps Script deployment.");
         }
 
         if (CONFIG.DEBUG) {
-          console.log("Parsed result:", result);
+          console.log("✅ Parsed result:", result);
         }
 
         if (result.success) {
           showAlert(`✅ Úspěšně odesláno ${data.items.length} položek!`, "success");
-          setTimeout(() => {
-            clearForm();
-          }, 2000);
-          clearDraftData();
-          isDirty = false;
+          setTimeout(() => clearForm(), 2000);
         } else {
           throw new Error(result.error || "Neznámá chyba serveru");
         }
         
       } catch (error) {
-        console.error("Chyba při odesílání:", error);
+        console.error("❌ Chyba při odesílání:", error);
         
-        let errorMessage = "Neznámá chyba";
-        if (error.name === 'AbortError') {
-          errorMessage = "Požadavek vypršel (timeout)";
-        } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-          errorMessage = "Chyba sítě nebo CORS. Zkontrolujte URL a deployment nastavení.";
-        } else if (error.message) {
-          errorMessage = error.message;
+        let errorMessage = error.message;
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          errorMessage = "Chyba sítě nebo špatná URL. Zkontroluj Google Apps Script deployment.";
         }
         
-        showAlert(`❌ Chyba při odesílání: ${errorMessage}`, "danger");
-        
-        if (CONFIG.DEBUG) {
-          console.log("Error details:", {
-            name: error.name,
-            message: error.message,
-            stack: error.stack
-          });
-        }
+        showAlert(`❌ Chyba: ${errorMessage}`, "danger");
       } finally {
         loadingOverlay.classList.add("d-none");
         submitBtn.disabled = false;
@@ -726,117 +371,17 @@
     function showAlert(message, type) {
       const result = document.getElementById("result");
       result.className = `alert alert-${type}`;
-      result.innerHTML = `<div class="d-flex align-items-center"><i class="bi bi-${getAlertIcon(type)} me-2"></i><span>${message}</span></div>`;
+      result.innerHTML = message;
       result.classList.remove("d-none");
-      result.scrollIntoView({ behavior: "smooth", block: "center" });
+      result.scrollIntoView({ behavior: "smooth" });
+      
       if (type === "success") {
-        setTimeout(() => {
-          result.classList.add("d-none");
-        }, 5000);
+        setTimeout(() => result.classList.add("d-none"), 5000);
       }
-    }
-
-    function getAlertIcon(type) {
-      const icons = {
-        success: "check-circle-fill",
-        danger: "exclamation-triangle-fill", 
-        warning: "exclamation-circle-fill",
-        info: "info-circle-fill",
-      };
-      return icons[type] || "info-circle-fill";
-    }
-
-    function handleKeyboardShortcuts(e) {
-      if (e.ctrlKey && e.key === "Enter") {
-        e.preventDefault();
-        document.getElementById("food-form").dispatchEvent(new Event("submit"));
-      }
-      if (e.ctrlKey && e.key === "n") {
-        e.preventDefault();
-        addFoodItem();
-      }
-      if (e.ctrlKey && e.shiftKey && e.key === "C") {
-        e.preventDefault();
-        clearForm();
-      }
-    }
-
-    function startAutoSave() {
-      if (autoSaveTimer) clearTimeout(autoSaveTimer);
-      autoSaveTimer = setTimeout(() => {
-        saveDraftData();
-      }, CONFIG.AUTO_SAVE_INTERVAL);
-    }
-
-    function saveDraftData() {
-      try {
-        const formData = gatherFormData();
-        if (formData) {
-          localStorage.setItem(
-            `draft_${currentClientKey}`,
-            JSON.stringify({
-              ...formData,
-              datum: document.getElementById("datum").value,
-              timestamp: new Date().toISOString(),
-            })
-          );
-          if (CONFIG.DEBUG) {
-            console.log("Draft uložen");
-          }
-        }
-      } catch (error) {
-        console.error("Chyba při ukládání draftu:", error);
-      }
-    }
-
-    function loadDraftData() {
-      try {
-        const draftKey = `draft_${currentClientKey}`;
-        const draftData = localStorage.getItem(draftKey);
-        if (draftData) {
-          const data = JSON.parse(draftData);
-          const draftAge = new Date() - new Date(data.timestamp);
-          if (draftAge < 24 * 60 * 60 * 1000) {
-            if (confirm("Byl nalezen neuložený draft. Chcete ho obnovit?")) {
-              restoreDraftData(data);
-            } else {
-              clearDraftData();
-            }
-          } else {
-            clearDraftData();
-          }
-        }
-      } catch (error) {
-        console.error("Chyba při načítání draftu:", error);
-        clearDraftData();
-      }
-    }
-
-    function restoreDraftData(data) {
-      document.getElementById("datum").value = data.datum;
-      document.getElementById("entries").innerHTML = "";
-      itemCounter = 0;
-
-      data.items.forEach((item) => {
-        addFoodItem();
-        const lastCard = document.querySelector(".entry-card:last-child");
-        lastCard.querySelector("select[name='druh_chodu']").value = item.druh_chodu;
-        lastCard.querySelector("input[name='hmotnost']").value = item.hmotnost;
-        lastCard.querySelector("input[name='potravina']").value = item.potravina;
-        lastCard.querySelector("input[name='kaloricka_hodnota']").value = item.kaloricka_hodnota;
-      });
-
-      showAlert("Draft byl obnoven", "info");
-      isDirty = false;
-    }
-
-    function clearDraftData() {
-      localStorage.removeItem(`draft_${currentClientKey}`);
     }
 
     // Global function for remove button
     window.removeFoodItem = removeFoodItem;
   </script>
 </body>
-
 </html>
