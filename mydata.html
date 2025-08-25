@@ -293,9 +293,9 @@
 
     function initializeMyData() {
       const urlParams = new URLSearchParams(window.location.search);
-      currentClientKey = urlParams.get("key") || "demo123";
+      currentClientKey = urlParams.get("key") || "DEMO";
       
-      document.getElementById("client-name").textContent = `Klient: ${currentClientKey}`;
+      document.getElementById("client-name").textContent = `Účet klienta: ${currentClientKey}`;
       document.getElementById("back-link").href = `index.html?key=${currentClientKey}`;
       
       loadClientData();
