@@ -134,7 +134,7 @@
 
     function initializeApp() {
       const urlParams = new URLSearchParams(window.location.search);
-      currentClientKey = urlParams.get("key") || "demo123";
+      currentClientKey = urlParams.get("key") || "DEMO";
       
       document.getElementById("client-name").textContent = `Klient: ${currentClientKey}`;
       document.getElementById("datum").value = new Date().toISOString().split("T")[0];
