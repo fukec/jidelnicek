@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Panel - Stravovací deník</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #28a745;
+      --secondary-color: #6c757d;
+      --success-color: #20c997;
+      --info-color: #17a2b8;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .main-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      margin: 2rem auto;
+      overflow: hidden;
+      max-width: 1400px;
+    }
+
+    .header-section {
+      background: linear-gradient(135deg, var(--info-color), var(--primary-color));
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .stats-card {
+      background: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stats-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 0.5rem 0;
+    }
+
+    .stats-label {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+
+    .filter-section {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .data-table {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .table th {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 1rem;
+    }
+
+    .table td {
+      padding: 1rem;
+      vertical-align: middle;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .loading-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .btn-export {
+      background: linear-gradient(135deg, var(--success-color), var(--primary-color));
+      border: none;
+    }
+
+    .debug-info {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="main-container">
+      
+      <!-- Header -->
+      <div class="header-section">
+        <h1><i class="bi bi-shield-check me-3"></i>Admin Panel</h1>
+        <p class="mb-0">Správa a přehled stravovacích deníků</p>
+        <div class="mt-3">
+          <a href="index.html?key=demo123" class="btn btn-light me-2">
+            <i class="bi bi-arrow-left me-1"></i>Zpět na formulář
+          </a>
+          <button id="refresh-btn" class="btn btn-outline-light">
+            <i class="bi bi-arrow-clockwise me-1"></i>Obnovit data
+          </button>
+        </div>
+      </div>
+
+      <div class="p-4">
+        
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+              <i class="bi bi-people-fill text-info" style="font-size: 2rem;"></i>
+              <div class="stats-number text-info" id="active-clients">0</div>
+              <div class="stats-label">Aktivní klienti<br>(za 30 dní)</div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+              <i class="bi bi-database-fill text-primary" style="font-size: 2rem;"></i>
+              <div class="stats-number text-primary" id="total-records">0</div>
+              <div class="stats-label">Celkem záznamů<br>(všechny časy)</div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+              <i class="bi bi-calendar-check text-success" style="font-size: 2rem;"></i>
+              <div class="stats-number text-success" id="today-records">0</div>
+              <div class="stats-label">Dnešní záznamy<br>(nové dnes)</div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+              <i class="bi bi-graph-up text-warning" style="font-size: 2rem;"></i>
+              <div class="stats-number text-warning" id="avg-per-day">0</div>
+              <div class="stats-label">Průměr za den<br>(posledních 7 dní)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+          <h4><i class="bi bi-funnel me-2"></i>Filtry a export dat</h4>
+          
+          <div class="row g-3 align-items-end">
+            <div class="col-lg-3 col-md-6">
+              <label class="form-label fw-semibold">Klient</label>
+              <select class="form-select" id="filter-client">
+                <option value="">Všichni klienti</option>
+              </select>
+            </div>
+            
+            <div class="col-lg-2 col-md-6">
+              <label class="form-label fw-semibold">Datum od</label>
+              <input type="date" class="form-control" id="filter-date-from">
+            </div>
+            
+            <div class="col-lg-2 col-md-6">
+              <label class="form-label fw-semibold">Datum do</label>
+              <input type="date" class="form-control" id="filter-date-to">
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+              <button type="button" class="btn btn-primary me-2" id="apply-filters">
+                <i class="bi bi-search me-1"></i>Filtrovat
+              </button>
+              <button type="button" class="btn btn-outline-secondary" id="clear-filters">
+                <i class="bi bi-x me-1"></i>Zrušit
+              </button>
+            </div>
+            
+            <div class="col-lg-2 col-md-6">
+              <h5>Export a akce</h5>
+              <button type="button" class="btn btn-export w-100" id="export-csv">
+                <i class="bi bi-download me-1"></i>Export CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="data-table">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Datum</th>
+                  <th>Klient</th>
+                  <th>Druh chodu</th>
+                  <th>Hmotnost (g/ml)</th>
+                  <th>Potravina</th>
+                  <th>Kalorie</th>
+                  <th>Čas vytvoření</th>
+                </tr>
+              </thead>
+              <tbody id="data-table-body">
+                <tr>
+                  <td colspan="7" class="text-center p-5">
+                    <div class="spinner-border text-primary mb-3" role="status"></div>
+                    <h5>Načítám data...</h5>
+                    <p class="text-muted mb-0">Prosím počkejte</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- No Data Message -->
+        <div id="no-data-message" class="text-center p-5 d-none">
+          <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+          <h4>Žádná data</h4>
+          <p class="text-muted">Zkuste upravit filtry nebo počkejte na nové záznamy od klientů.</p>
+        </div>
+
+        <!-- Debug Info -->
+        <div id="debug-info" class="debug-info"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay d-none">
+    <div class="loading-content">
+      <div class="spinner-border text-primary mb-3" role="status"></div>
+      <h5>Načítám data...</h5>
+      <p class="text-muted mb-0">Prosím počkejte</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ===== KONFIGURACE =====
+    const CONFIG = {
+      API_URL: "https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec", // ⚠️ NAHRAĎ SVOJÍ URL!
+      DEBUG: true
+    };
+
+    let allData = [];
+    let filteredData = [];
+
+    // ===== INICIALIZACE =====
+    document.addEventListener("DOMContentLoaded", function () {
+      initializeAdmin();
+    });
+
+    function initializeAdmin() {
+      setupEventListeners();
+      setDefaultDates();
+      loadAllData();
+      
+      if (CONFIG.DEBUG) {
+        showDebugInfo();
+      }
+    }
+
+    function showDebugInfo() {
+      document.getElementById("debug-info").innerHTML = `
+        <strong>🔧 ADMIN DEBUG INFO:</strong><br>
+        API URL: ${CONFIG.API_URL}<br>
+        Status: ${CONFIG.API_URL.includes('YOUR_SCRIPT_ID') ? '❌ MUSÍŠ NASTAVIT URL!' : '✅ URL nastavena'}<br>
+        Timestamp: ${new Date().toISOString()}
+      `;
+    }
+
+    function setupEventListeners() {
+      document.getElementById("refresh-btn").addEventListener("click", loadAllData);
+      document.getElementById("apply-filters").addEventListener("click", applyFilters);
+      document.getElementById("clear-filters").addEventListener("click", clearFilters);
+      document.getElementById("export-csv").addEventListener("click", exportToCSV);
+    }
+
+    function setDefaultDates() {
+      const today = new Date();
+      const weekAgo = new Date(today);
+      weekAgo.setDate(today.getDate() - 7);
+      
+      document.getElementById("filter-date-to").value = today.toISOString().split('T')[0];
+      document.getElementById("filter-date-from").value = weekAgo.toISOString().split('T')[0];
+    }
+
+    async function loadAllData() {
+      const loadingOverlay = document.getElementById("loading-overlay");
+      
+      try {
+        loadingOverlay.classList.remove("d-none");
+        
+        if (CONFIG.API_URL.includes('YOUR_SCRIPT_ID')) {
+          throw new Error("Musíš nastavit API_URL v kódu!");
+        }
+
+        if (CONFIG.DEBUG) {
+          console.log("🔄 Načítám admin data...");
+        }
+
+        const response = await fetch(`${CONFIG.API_URL}?admin=1`, {
+          method: "GET",
+          redirect: "follow"
+        });
+
+        const responseText = await response.text();
+        
+        if (CONFIG.DEBUG) {
+          console.log("📡 Raw response:", responseText);
+        }
+
+        let result;
+        try {
+          result = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error("❌ JSON parse error:", parseError);
+          throw new Error("Server nevrátil platný JSON");
+        }
+
+        if (result.success) {
+          allData = result.data || [];
+          filteredData = [...allData];
+          
+          updateClientFilter();
+          updateStatistics();
+          updateDataTable();
+          
+          if (CONFIG.DEBUG) {
+            console.log("✅ Data načtena:", allData.length, "záznamů");
+          }
+        } else {
+          throw new Error(result.error || "Chyba při načítání dat");
+        }
+
+      } catch (error) {
+        console.error("❌ Chyba při načítání:", error);
+        showError(`Chyba při načítání dat: ${error.message}`);
+      } finally {
+        loadingOverlay.classList.add("d-none");
+      }
+    }
+
+    function updateClientFilter() {
+      const clientSelect = document.getElementById("filter-client");
+      const clients = [...new Set(allData.map(item => item.klient_klic))].sort();
+      
+      clientSelect.innerHTML = '<option value="">Všichni klienti</option>';
+      clients.forEach(client => {
+        clientSelect.innerHTML += `<option value="${client}">${client}</option>`;
+      });
+    }
+
+    function updateStatistics() {
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const thirtyDaysAgo = new Date(now);
+      thirtyDaysAgo.setDate(now.getDate() - 30);
+      const sevenDaysAgo = new Date(now);
+      sevenDaysAgo.setDate(now.getDate() - 7);
+
+      // Aktivní klienti (za 30 dní)
+      const recentData = allData.filter(item => new Date(item.datum) >= thirtyDaysAgo);
+      const activeClients = new Set(recentData.map(item => item.klient_klic)).size;
+      
+      // Celkem záznamů
+      const totalRecords = allData.length;
+      
+      // Dnešní záznamy
+      const todayRecords = allData.filter(item => item.datum === today).length;
+      
+      // Průměr za den (posledních 7 dní)
+      const weekData = allData.filter(item => new Date(item.datum) >= sevenDaysAgo);
+      const avgPerDay = Math.round(weekData.length / 7);
+
+      // Aktualizace UI
+      document.getElementById("active-clients").textContent = activeClients;
+      document.getElementById("total-records").textContent = totalRecords;
+      document.getElementById("today-records").textContent = todayRecords;
+      document.getElementById("avg-per-day").textContent = avgPerDay;
+    }
+
+    function updateDataTable() {
+      const tableBody = document.getElementById("data-table-body");
+      const noDataMessage = document.getElementById("no-data-message");
+      
+      if (filteredData.length === 0) {
+        tableBody.innerHTML = "";
+        noDataMessage.classList.remove("d-none");
+        return;
+      }
+      
+      noDataMessage.classList.add("d-none");
+      
+      // Seřadit podle data (nejnovější první)
+      const sortedData = [...filteredData].sort((a, b) => {
+        return new Date(b.datum + ' ' + (b.timestamp || '00:00')) - new Date(a.datum + ' ' + (a.timestamp || '00:00'));
+      });
+
+      tableBody.innerHTML = sortedData.map(item => `
+        <tr>
+          <td><strong>${formatDate(item.datum)}</strong></td>
+          <td><span class="badge bg-info">${item.klient_klic}</span></td>
+          <td><span class="badge bg-secondary">${item.druh_chodu}</span></td>
+          <td class="text-end">${parseFloat(item.hmotnost).toLocaleString('cs-CZ')} g/ml</td>
+          <td>${item.potravina}</td>
+          <td class="text-end"><strong>${item.kaloricka_hodnota || 0} kcal</strong></td>
+          <td class="text-muted">${item.timestamp || '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function applyFilters() {
+      const client = document.getElementById("filter-client").value;
+      const dateFrom = document.getElementById("filter-date-from").value;
+      const dateTo = document.getElementById("filter-date-to").value;
+
+      filteredData = allData.filter(item => {
+        if (client && item.klient_klic !== client) return false;
+        if (dateFrom && item.datum < dateFrom) return false;
+        if (dateTo && item.datum > dateTo) return false;
+        return true;
+      });
+
+      updateDataTable();
+      
+      if (CONFIG.DEBUG) {
+        console.log("🔍 Filtry aplikovány:", {
+          client, dateFrom, dateTo,
+          results: filteredData.length
+        });
+      }
+    }
+
+    function clearFilters() {
+      document.getElementById("filter-client").value = "";
+      document.getElementById("filter-date-from").value = "";
+      document.getElementById("filter-date-to").value = "";
+      
+      filteredData = [...allData];
+      updateDataTable();
+    }
+
+    function exportToCSV() {
+      if (filteredData.length === 0) {
+        alert("Žádná data k exportu!");
+        return;
+      }
+
+      const headers = ["Datum", "Klient", "Druh chodu", "Hmotnost (g/ml)", "Potravina", "Kalorie", "Čas vytvoření"];
+      const csvContent = [
+        headers.join(","),
+        ...filteredData.map(item => [
+          item.datum,
+          item.klient_klic,
+          `"${item.druh_chodu}"`,
+          item.hmotnost,
+          `"${item.potravina}"`,
+          item.kaloricka_hodnota || 0,
+          `"${item.timestamp || ''}"`
+        ].join(","))
+      ].join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `stravovaci-denik-export-${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      if (CONFIG.DEBUG) {
+        console.log("📊 CSV export:", filteredData.length, "záznamů");
+      }
+    }
+
+    function formatDate(dateStr) {
+      try {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('cs-CZ');
+      } catch (e) {
+        return dateStr;
+      }
+    }
+
+    function showError(message) {
+      const tableBody = document.getElementById("data-table-body");
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="text-center p-5">
+            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+            <h5 class="text-danger mt-3">Chyba</h5>
+            <p class="text-muted">${message}</p>
+          </td>
+        </tr>
+      `;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Týdenní přehled stravy - Stravovací deník</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #28a745;
+      --secondary-color: #6c757d;
+      --success-color: #20c997;
+      --info-color: #17a2b8;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .main-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      margin: 2rem auto;
+      overflow: hidden;
+      max-width: 1200px;
+    }
+
+    .header-section {
+      background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .stats-card {
+      background: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stats-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 0.5rem 0;
+    }
+
+    .stats-label {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+
+    .day-card {
+      background: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .day-header {
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .meal-item {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .meal-badge {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .progress-bar-container {
+      background: #e9ecef;
+      border-radius: 10px;
+      height: 8px;
+      overflow: hidden;
+      margin: 0.5rem 0;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: width 0.3s ease;
+    }
+
+    .summary-table {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .table th {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 1rem;
+    }
+
+    .table td {
+      padding: 1rem;
+      vertical-align: middle;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .loading-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .debug-info {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #6c757d;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="main-container">
+      
+      <!-- Header -->
+      <div class="header-section">
+        <h1><i class="bi bi-graph-up me-3"></i>Týdenní přehled stravy</h1>
+        <p class="mb-3">Detailní analýza vašich stravovacích dat</p>
+        <div class="client-info" id="client-name">Načítám...</div>
+        <div class="mt-3">
+          <a href="#" id="back-link" class="btn btn-light">
+            <i class="bi bi-arrow-left me-1"></i>Zpět na formulář
+          </a>
+        </div>
+      </div>
+
+      <div class="p-4">
+        
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center p-5">
+          <div class="spinner-border text-primary mb-3" role="status"></div>
+          <h4>Načítám data...</h4>
+          <p class="text-muted mb-0">Prosím počkejte, zpracovávám váš týdenní přehled</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div id="stats-section" class="row g-4 mb-4 d-none">
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+              <i class="bi bi-calendar-check text-primary" style="font-size: 2rem;"></i>
+              <div class="stats-number text-primary" id="days-with-data">0</div>
+              <div class="stats-label">Dní s daty</div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+              <i class="bi bi-list-ul text-success" style="font-size: 2rem;"></i>
+              <div class="stats-number text-success" id="total-items">0</div>
+              <div class="stats-label">Celkem položek</div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+              <i class="bi bi-fire text-warning" style="font-size: 2rem;"></i>
+              <div class="stats-number text-warning" id="total-calories">0</div>
+              <div class="stats-label">Celkem kalorií</div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+              <i class="bi bi-calculator text-info" style="font-size: 2rem;"></i>
+              <div class="stats-number text-info" id="avg-per-day">0</div>
+              <div class="stats-label">Průměr/den</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daily Overview -->
+        <div id="daily-section" class="d-none">
+          <h3><i class="bi bi-calendar3 me-2"></i>Detailní přehled podle dnů</h3>
+          <div id="daily-overview"></div>
+        </div>
+
+        <!-- Meal Summary -->
+        <div id="summary-section" class="d-none">
+          <h3><i class="bi bi-pie-chart me-2"></i>Souhrn podle chodu jídla</h3>
+          <div class="summary-table">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Chod jídla</th>
+                    <th>Počet položek</th>
+                    <th>Celkem kalorií</th>
+                    <th>Průměr/den</th>
+                    <th>Podíl (%)</th>
+                    <th>Vizualizace</th>
+                  </tr>
+                </thead>
+                <tbody id="summary-table-body">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Data Message -->
+        <div id="no-data-section" class="no-data d-none">
+          <i class="bi bi-inbox" style="font-size: 4rem;"></i>
+          <h3>Žádná data za posledních 7 dní</h3>
+          <p>Začněte zadávat svůj stravovací deník pomocí formuláře.<br>
+             Data se zde zobrazí automaticky po jejich zadání.</p>
+        </div>
+
+        <!-- Debug Info -->
+        <div id="debug-info" class="debug-info"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay d-none">
+    <div class="loading-content">
+      <div class="spinner-border text-primary mb-3" role="status"></div>
+      <h5>Načítám data...</h5>
+      <p class="text-muted mb-0">Prosím počkejte</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ===== KONFIGURACE =====
+    const CONFIG = {
+      API_URL: "https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec", // ⚠️ NAHRAĎ SVOJÍ URL!
+      DEBUG: true
+    };
+
+    let currentClientKey = "";
+    let clientData = [];
+
+    // ===== INICIALIZACE =====
+    document.addEventListener("DOMContentLoaded", function () {
+      initializeMyData();
+    });
+
+    function initializeMyData() {
+      const urlParams = new URLSearchParams(window.location.search);
+      currentClientKey = urlParams.get("key") || "demo123";
+      
+      document.getElementById("client-name").textContent = `Klient: ${currentClientKey}`;
+      document.getElementById("back-link").href = `index.html?key=${currentClientKey}`;
+      
+      loadClientData();
+      
+      if (CONFIG.DEBUG) {
+        showDebugInfo();
+      }
+    }
+
+    function showDebugInfo() {
+      document.getElementById("debug-info").innerHTML = `
+        <strong>🔧 CLIENT DEBUG INFO:</strong><br>
+        Klient: ${currentClientKey}<br>
+        API URL: ${CONFIG.API_URL}<br>
+        Status: ${CONFIG.API_URL.includes('YOUR_SCRIPT_ID') ? '❌ MUSÍŠ NASTAVIT URL!' : '✅ URL nastavena'}<br>
+        Timestamp: ${new Date().toISOString()}
+      `;
+    }
+
+    async function loadClientData() {
+      try {
+        if (CONFIG.API_URL.includes('YOUR_SCRIPT_ID')) {
+          throw new Error("Musíš nastavit API_URL v kódu!");
+        }
+
+        if (CONFIG.DEBUG) {
+          console.log("🔄 Načítám data pro klienta:", currentClientKey);
+        }
+
+        const response = await fetch(`${CONFIG.API_URL}?key=${currentClientKey}&days=7`, {
+          method: "GET",
+          redirect: "follow"
+        });
+
+        const responseText = await response.text();
+        
+        if (CONFIG.DEBUG) {
+          console.log("📡 Raw response:", responseText);
+        }
+
+        let result;
+        try {
+          result = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error("❌ JSON parse error:", parseError);
+          throw new Error("Server nevrátil platný JSON");
+        }
+
+        if (result.success) {
+          clientData = result.data || [];
+          
+          if (clientData.length === 0) {
+            showNoData();
+          } else {
+            processAndDisplayData();
+          }
+          
+          if (CONFIG.DEBUG) {
+            console.log("✅ Data načtena:", clientData.length, "položek");
+          }
+        } else {
+          throw new Error(result.error || "Chyba při načítání dat");
+        }
+
+      } catch (error) {
+        console.error("❌ Chyba při načítání:", error);
+        showError(`Chyba při načítání dat: ${error.message}`);
+      } finally {
+        document.getElementById("loading-state").classList.add("d-none");
+      }
+    }
+
+    function processAndDisplayData() {
+      // Skrýt loading a zobrazit data sekce
+      document.getElementById("loading-state").classList.add("d-none");
+      document.getElementById("stats-section").classList.remove("d-none");
+      document.getElementById("daily-section").classList.remove("d-none");
+      document.getElementById("summary-section").classList.remove("d-none");
+
+      updateStatistics();
+      updateDailyOverview();
+      updateMealSummary();
+    }
+
+    function updateStatistics() {
+      // Počet dní s daty
+      const uniqueDays = [...new Set(clientData.map(item => item.datum))].length;
+      
+      // Celkem položek
+      const totalItems = clientData.length;
+      
+      // Celkem kalorií
+      const totalCalories = clientData.reduce((sum, item) => sum + (parseFloat(item.kaloricka_hodnota) || 0), 0);
+      
+      // Průměr kalorií za den
+      const avgPerDay = uniqueDays > 0 ? Math.round(totalCalories / uniqueDays) : 0;
+
+      document.getElementById("days-with-data").textContent = uniqueDays;
+      document.getElementById("total-items").textContent = totalItems;
+      document.getElementById("total-calories").textContent = totalCalories.toLocaleString('cs-CZ');
+      document.getElementById("avg-per-day").textContent = avgPerDay.toLocaleString('cs-CZ');
+    }
+
+    function updateDailyOverview() {
+      const dailyContainer = document.getElementById("daily-overview");
+      
+      // Seskupit data podle dnů
+      const dataByDay = {};
+      clientData.forEach(item => {
+        if (!dataByDay[item.datum]) {
+          dataByDay[item.datum] = [];
+        }
+        dataByDay[item.datum].push(item);
+      });
+
+      // Seřadit dny od nejnovějšího
+      const sortedDays = Object.keys(dataByDay).sort((a, b) => new Date(b) - new Date(a));
+
+      dailyContainer.innerHTML = sortedDays.map(day => {
+        const dayData = dataByDay[day];
+        const dayCalories = dayData.reduce((sum, item) => sum + (parseFloat(item.kaloricka_hodnota) || 0), 0);
+        const dayDate = new Date(day);
+        const dayName = dayDate.toLocaleDateString('cs-CZ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        return `
+          <div class="day-card">
+            <div class="day-header">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">${dayName}</h5>
+                <span class="badge bg-primary fs-6">${dayCalories} kcal celkem</span>
+              </div>
+            </div>
+            ${dayData.map(item => `
+              <div class="meal-item">
+                <div>
+                  <span class="badge meal-badge bg-secondary me-2">${item.druh_chodu}</span>
+                  <strong>${item.potravina}</strong>
+                  <small class="text-muted ms-2">(${parseFloat(item.hmotnost).toLocaleString('cs-CZ')} g/ml)</small>
+                </div>
+                <div class="text-end">
+                  <strong>${item.kaloricka_hodnota || 0} kcal</strong>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateMealSummary() {
+      const tableBody = document.getElementById("summary-table-body");
+      
+      // Seskupit podle chodu jídla
+      const mealSummary = {};
+      let totalCalories = 0;
+
+      clientData.forEach(item => {
+        const meal = item.druh_chodu;
+        const calories = parseFloat(item.kaloricka_hodnota) || 0;
+        
+        if (!mealSummary[meal]) {
+          mealSummary[meal] = {
+            count: 0,
+            calories: 0
+          };
+        }
+        
+        mealSummary[meal].count++;
+        mealSummary[meal].calories += calories;
+        totalCalories += calories;
+      });
+
+      // Počet dní pro průměr
+      const uniqueDays = [...new Set(clientData.map(item => item.datum))].length || 1;
+
+      // Seřadit podle počtu kalorií
+      const sortedMeals = Object.entries(mealSummary).sort((a, b) => b[1].calories - a[1].calories);
+
+      tableBody.innerHTML = sortedMeals.map(([meal, data]) => {
+        const avgPerDay = Math.round(data.calories / uniqueDays);
+        const percentage = totalCalories > 0 ? Math.round((data.calories / totalCalories) * 100) : 0;
+
+        return `
+          <tr>
+            <td><span class="badge bg-secondary">${meal}</span></td>
+            <td><strong>${data.count}</strong></td>
+            <td><strong>${data.calories.toLocaleString('cs-CZ')} kcal</strong></td>
+            <td>${avgPerDay.toLocaleString('cs-CZ')} kcal</td>
+            <td><strong>${percentage}%</strong></td>
+            <td>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill bg-primary" style="width: ${percentage}%"></div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function showNoData() {
+      document.getElementById("loading-state").classList.add("d-none");
+      document.getElementById("no-data-section").classList.remove("d-none");
+    }
+
+    function showError(message) {
+      document.getElementById("loading-state").innerHTML = `
+        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+        <h4 class="text-danger mt-3">Chyba</h4>
+        <p class="text-muted">${message}</p>
+      `;
+    }
+  </script>
+</body>
+</html>
